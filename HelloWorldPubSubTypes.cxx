@@ -32,6 +32,7 @@ HelloWorldPubSubType::HelloWorldPubSubType()
 {
     setName("HelloWorld");
     m_typeSize = static_cast<uint32_t>(HelloWorld::getMaxCdrSerializedSize()) + 4 /*encapsulation*/;
+
     m_isGetKeyDefined = HelloWorld::isKeyDefined();
     size_t keyLength = HelloWorld::getKeyMaxCdrSerializedSize()>16 ? HelloWorld::getKeyMaxCdrSerializedSize() : 16;
     m_keyBuffer = reinterpret_cast<unsigned char*>(malloc(keyLength));

@@ -33,6 +33,19 @@ if(NOT fastrtps_FOUND)
     find_package(fastrtps REQUIRED)
 endif()
 
+
+find_package(OpenCV REQUIRED)
+
+if(OpenCV_FOUND)
+    message(STATUS,"Found opencv")
+endif()
+message(STATUS,"OpenCV_INCLUDE_DIRS " ${OpenCV_INCLUDE_DIRS})
+message(STATUS,"project SOURCE DIR " ${PROJECT_SOURCE_DIR})
+
+# message(STATUS,"SFML_DIR " ${SFML_INCLUDE_DIR})
+
+# include_directories(OpenCV_INCLUDE_DIRS)
+include_directories(${OpenCV_INCLUDE_DIRS})
 #Check C++11
 include(CheckCXXCompilerFlag)
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG OR
@@ -55,11 +68,11 @@ configure_file("server.pem" "server.pem" COPYONLY)
 configure_file("ca.pem" "ca.pem" COPYONLY)
 
 
-add_executable(HelloWorldExampleTCP ${HELLOWORLD_EXAMPLE_SOURCES_CXX} ${HELLOWORLD_EXAMPLE_SOURCES_CPP})
+add_executable(HelloWorldExampleTCP ${HELLOWORLD_EXAMPLE_SOURCES_CXX} ${HELLOWORLD_EXAMPLE_SOURCES_CPP} miniaudio.h )
 target_compile_definitions(HelloWorldExampleTCP PRIVATE
     $<$<AND:$<NOT:$<BOOL:${WIN32}>>,$<STREQUAL:"${CMAKE_BUILD_TYPE}","Debug">>:__DEBUG>
     $<$<BOOL:${INTERNAL_DEBUG}>:__INTERNALDEBUG> # Internal debug activated.
 )
-target_link_libraries(HelloWorldExampleTCP fastrtps fastcdr foonathan_memory)
+target_link_libraries(HelloWorldExampleTCP fastrtps fastcdr foonathan_memory     pthread   ${OpenCV_LIBS})
 install(TARGETS HelloWorldExampleTCP
     RUNTIME DESTINATION examples/C++/HelloWorldExampleTCP/${BIN_INSTALL_DIR})

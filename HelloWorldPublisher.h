@@ -25,7 +25,7 @@
 #include <fastrtps/fastrtps_fwd.h>
 #include <fastrtps/attributes/PublisherAttributes.h>
 #include <fastrtps/publisher/PublisherListener.h>
-
+#include <string>
 
 #include "HelloWorld.h"
 
@@ -59,6 +59,9 @@ class HelloWorldPublisher {
     void runThread(
         uint32_t number,
         long sleep_ms);
+    void runThread1(
+        uint32_t number,
+        std::string name);
 
 public:
     HelloWorldPublisher();
@@ -75,11 +78,22 @@ public:
     //!Publish a sample
     bool publish(bool waitForListener = true);
 
+    bool publish1(HelloWorld data);
+
     //!Run for number samples
     void run(
         uint32_t number,
         long sleep_ms);
+
+
+    void run1(
+        uint32_t number,
+        std::string name);
+
 };
+
+
+
 
 
 
