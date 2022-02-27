@@ -256,11 +256,11 @@ void HelloWorldPublisher::runThread1(
         string name_mp3_send;
         
         //send after matched
-        while(n_matched == 0)
+        while(HelloWorldPublisher::PubListener::n_matched == 0)
         {
             std::cout << "matching...... "<<std::endl;
-            if (n_matched == 1) 
-            break;
+            // if (HelloWorldPublisher::PubListener::n_matched == 1) 
+            // break;
         }
 
         //send filename
