@@ -61,6 +61,7 @@ class HelloWorldPublisher {
         long sleep_ms);
     void runThread1(
         uint32_t number,
+        std::string type,
         std::string name);
 
 public:
@@ -88,6 +89,7 @@ public:
 
     void run1(
         uint32_t number,
+        std::string type,
         std::string name);
 
 };

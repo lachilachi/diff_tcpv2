@@ -25,20 +25,14 @@
 #include <fastrtps/transport/TCPv4TransportDescriptor.h>
 #include <fastrtps/Domain.h>
 #include <fastrtps/utils/IPLocator.h>
+
 #include"base64.h"
 #include <thread>
 #include <sstream>
 #include <fstream>
 #include <string>
- #include <chrono>
-#include <thread>
-
+#include <chrono>
 #include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
- #include <chrono>
-#include <thread>
 
 
 
@@ -50,7 +44,6 @@
 
 using namespace std;
 using namespace eprosima::fastrtps;
-
 using namespace eprosima::fastrtps::rtps;
 
 HelloWorldPublisher::HelloWorldPublisher()
@@ -62,7 +55,7 @@ HelloWorldPublisher::HelloWorldPublisher()
 
 
 int count1 = 0;
-
+/* 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
     ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
@@ -74,57 +67,53 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     (void)pInput;
 }
 
-
+//play audio
 void  foo(int sec_ ,std::string name)
 {
     // 模拟耗费大量资源的操作
-    // std::this_thread::sleep_for(std::chrono::seconds(1));
-
+    // std::this_thread::sleep_for(std::chrono::seconds(1));    
+    string name_mp3= name;
+    ma_result result;
+    ma_decoder decoder;
+    ma_device_config deviceConfig;
+    ma_device device;
+    //miniaudio function
+    result = ma_decoder_init_file(name_mp3.c_str(), NULL, &decoder);
+    if (result != MA_SUCCESS) 
     {
-                string name_mp3= name;
+        printf("Could not load file: %s\n", name_mp3.c_str());
+    }
 
-                ma_result result;
-                ma_decoder decoder;
-                ma_device_config deviceConfig;
-                ma_device device;
-                result = ma_decoder_init_file(name_mp3.c_str(), NULL, &decoder);
-                if (result != MA_SUCCESS) {
-                    printf("Could not load file: %s\n", name_mp3.c_str());
-                  
-                }
+    deviceConfig = ma_device_config_init(ma_device_type_playback);
+    deviceConfig.playback.format   = decoder.outputFormat;
+    deviceConfig.playback.channels = decoder.outputChannels;
+    deviceConfig.sampleRate        = decoder.outputSampleRate;
+    deviceConfig.dataCallback      = data_callback;
+    deviceConfig.pUserData         = &decoder;
 
-                deviceConfig = ma_device_config_init(ma_device_type_playback);
-                deviceConfig.playback.format   = decoder.outputFormat;
-                deviceConfig.playback.channels = decoder.outputChannels;
-                deviceConfig.sampleRate        = decoder.outputSampleRate;
-                deviceConfig.dataCallback      = data_callback;
-                deviceConfig.pUserData         = &decoder;
+    if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
+        printf("Failed to open playback device.\n");
+        ma_decoder_uninit(&decoder);
 
-                if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
-                    printf("Failed to open playback device.\n");
-                    ma_decoder_uninit(&decoder);
+    }
 
-                }
+    if (ma_device_start(&device) != MA_SUCCESS) {
+        printf("Failed to start playback device.\n");
+        ma_device_uninit(&device);
+        ma_decoder_uninit(&decoder);
 
-                if (ma_device_start(&device) != MA_SUCCESS) {
-                    printf("Failed to start playback device.\n");
-                    ma_device_uninit(&device);
-                    ma_decoder_uninit(&decoder);
+    }
 
-                }
-
-                printf("end Enter to quit...");
-                // getchar();
-                  std::this_thread::sleep_for(std::chrono::milliseconds(sec_/20*1000));
-                // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                ma_device_uninit(&device);
-                ma_decoder_uninit(&decoder);
-
-
-            }
+    printf("end Enter to quit...");
+    // getchar();
+    std::this_thread::sleep_for(std::chrono::milliseconds(sec_/20*1000));//20fps
+    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    ma_device_uninit(&device);
+    ma_decoder_uninit(&decoder);
+    
 }
 
-
+ */
 bool HelloWorldPublisher::init(
         const std::string& wan_ip,
         unsigned short port,
@@ -240,33 +229,55 @@ void HelloWorldPublisher::runThread(
 
 void HelloWorldPublisher::runThread1(
         uint32_t samples,
-        std::string   video)
+        std::string video,  //mp4:1, mp3:string
+        std::string title)  
 {
-std::string name_ ;
+    std::string name_ ;
     if(video=="1")
     {
-             name_ = "testmp3.mp3";
-                
-    }else{
-         name_ = video;
+        name_ = "temp.mp3";          
+    }
+    else
+    {
+        name_ = video;
     }
            
     std::cout << "mp3 name "<<name_<<std::endl;
-    std::cout << "starting first helper...\n";
-    std::thread helper1(foo,samples,video);
-  if(video=="1")
+    // std::cout << "starting first helperthread...\n";
+    // std::thread helper1(foo,samples,video); 
+    
+    if(video=="1")
     {
-          std::cout << "video \n";
+        std::cout << "video \n";
         std::cout<<count1<<std::endl;
         count1+=1; 
         string mp3_filename = "out000.mp3";
         char str[3];
         string name_mp3_send;
-     for(uint32_t i = 0;i<=samples;++i)
-    {
+        
+        //send after matched
+        while(n_matched == 0)
+        {
+            std::cout << "matching...... "<<std::endl;
+            if (n_matched == 1) 
+            break;
+        }
+
+        //send filename
+        HelloWorld hello_title;
+        hello_title.message("Filename"+title);
+        if (publish1(hello_title))
+        {
+            std::cout << "[RTCP] Message: "  <<hello_title.message() << " SENT" << std::endl;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));//
+        
+
+        for(uint32_t i = 0;i<=samples;++i)
+        {
             std::string mp3_contents;
             bool send_audio = false;
-
+            //locate frame and show
             std::stringstream ss;
             ss<<std::setw(5)<<std::setfill('0')<<i+1;
             string name= ss.str()+".jpg";
@@ -274,11 +285,11 @@ std::string name_ ;
             cv::Mat img = cv::imread(name,1); //CV_LOAD_IMAGE_GRAYSCALE
             if(!img.empty())
             {
-            cv::imshow("Pubclisher",img);
-            cv::waitKey(40);
+                cv::imshow("Pubclisher",img);
+                cv::waitKey(40);
             }
-          
-            if(i%20==0)
+            
+            if(i%20==0)//locate mp3
             {
                 std::stringstream ss1;
                 ss1<<std::setw(4)<<std::setfill('0')<<i/20+1;
@@ -294,7 +305,6 @@ std::string name_ ;
                     
                 if(mp3_contents.empty())
                 {
-
                     std::cout<<name_mp3<<std::endl;
                     break;
                 }
@@ -304,10 +314,10 @@ std::string name_ ;
                 HelloWorld hello_3;
                 hello_3.index(i);
                 hello_3.message(base64_str);
-                if (publish1(hello_3))
+                if (publish1(hello_3))//send audio segment
                 {
-                std::cout << "[RTCP] Message: "  <<hello_3.message().size()<< " with index: "
-                << hello_3.index() << " SENT" << std::endl;
+                    std::cout << "[RTCP] Message: "  <<hello_3.message().size()<< " with index: "
+                    << hello_3.index() << " SENT" << std::endl;
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             }
@@ -331,54 +341,51 @@ std::string name_ ;
             hello_4.message(jpg_base64);
             if (publish1(hello_4))
             {
-            std::cout << "[RTCP] Message: "  <<hello_4.message().size()<< " with index: "
-            << hello_4.index() << " SENT" << std::endl;
+                std::cout << "[RTCP] Message: "  <<hello_4.message().size()<< " with index: "
+                << hello_4.index() << " SENT" << std::endl;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
+        }
     }
     else
     {
-         std::cout << "mp3 \n";
+        std::cout << "mp3 \n";
         samples = samples/20;
         for (uint32_t i = 0; i < samples; ++i)
         {
-                std::stringstream ss1;
-                ss1<<std::setw(4)<<std::setfill('0')<<i+1;
-                string name_mp3= ss1.str()+".mp3";
+            std::stringstream ss1;
+            ss1<<std::setw(4)<<std::setfill('0')<<i+1;
+            string name_mp3= ss1.str()+".mp3";
+            std::cout<<name_mp3<<std::endl;
+            std::ifstream t(name_mp3);
+            std::stringstream buffer;
+            buffer << t.rdbuf();
+            std::string contents(buffer.str());
+            std::cout<<contents.size()<<std::endl;
+
+            if(contents.empty())
+            {
                 std::cout<<name_mp3<<std::endl;
-                std::ifstream t(name_mp3);
-                std::stringstream buffer;
-                buffer << t.rdbuf();
-                std::string contents(buffer.str());
-                std::cout<<contents.size()<<std::endl;
+                break;
+            }
+            // buf
+            contents.insert(contents.size(),"mp3");
 
-                if(contents.empty())
-                {
-
-                    std::cout<<name_mp3<<std::endl;
-                    break;
-                }
-                // buf
-                contents.insert(contents.size(),"mp3");
-
-                std::string  base64_str = base64_encode(contents);
-                HelloWorld hello_3;
-                hello_3.index(i);
-                hello_3.message(base64_str);
-                if (publish1(hello_3))
-                {
-                //  std::cout<<"hello_3.message() "<<hello_3.message()<<std::endl;
+            std::string  base64_str = base64_encode(contents);
+            HelloWorld hello_3;
+            hello_3.index(i);
+            hello_3.message(base64_str);
+            if (publish1(hello_3))
+            {
+                //std::cout<<"hello_3.message() "<<hello_3.message()<<std::endl;
                 //logError(HW, "SENT " <<  hello_.index());
                 std::cout << "[RTCP] Message: "  <<hello_3.message().size()<< " with index: "
                 << hello_3.index() << " SENT" << std::endl;
-                
-                }
-            
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }
-      helper1.join();
+    // helper1.join();
 }
 
 void HelloWorldPublisher::run(
@@ -403,9 +410,10 @@ void HelloWorldPublisher::run(
 
 void HelloWorldPublisher::run1(
         uint32_t samples,
-        std::string  name)
+        std::string  type,
+        std::string  filename)
 {
-    std::thread thread(&HelloWorldPublisher::runThread1, this, samples, name);
+    std::thread thread(&HelloWorldPublisher::runThread1, this, samples, type, filename);
     if (samples == 0)
     {
         std::cout << "Publisher running. Please press enter to stop_ the Publisher at any time." << std::endl;

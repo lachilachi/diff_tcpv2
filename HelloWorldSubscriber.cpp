@@ -28,7 +28,7 @@
 #include"base64.h"
 
 #include <string>
- #include <chrono>
+#include <chrono>
 #include <thread>
 #include <sstream>
 #include <fstream>
@@ -48,14 +48,14 @@ HelloWorldSubscriber::HelloWorldSubscriber()
 
 
 
-
+//write a string to the specified file
 int write_string_to_file_append(const std::string & file_string, const std::string str )
-{
-	std::ofstream	OsWrite(file_string,std::ofstream::app);
+{//第一个参数是文件存储地址和文件名字符串，第二个字符串是要写入的内容。
+	std::ofstream OsWrite(file_string,std::ofstream::app);
 	OsWrite<<str;
 	OsWrite<<std::endl;
 	OsWrite.close();
-   return 0;
+    return 0;
 }
 
 
@@ -79,7 +79,8 @@ std::string exec2(const char* cmd) {
 void data_callback1(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
     ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
-    if (pDecoder == NULL) {
+    if (pDecoder == NULL) 
+    {
         return;
     }
 
@@ -87,62 +88,59 @@ void data_callback1(ma_device* pDevice, void* pOutput, const void* pInput, ma_ui
 
     (void)pInput;
 }
+
 string name_mp3_g;
 bool play_flag = false;
 bool play_flag1= false;
-void player(int sec_,string name)
+void player(int sec_,string name)//Play audio with miniaudio
 {
-     
     while (1)
     {  
-      
-    if(1)
-    {
-      
-                string name_mp3=name_mp3_g;
+        if(1)
+        {
+            //string name_mp3= name;
+            string name_mp3=name_mp3_g;
 
-                ma_result result;
-                ma_decoder decoder;
-                ma_device_config deviceConfig;
-                ma_device device;
-                result = ma_decoder_init_file(name_mp3.c_str(), NULL, &decoder);
-                if (result != MA_SUCCESS) {
-                    // printf("Could not load file: %s\n", name_mp3.c_str());
-                  
-                }
+            ma_result result;
+            ma_decoder decoder;
+            ma_device_config deviceConfig;
+            ma_device device;
+            result = ma_decoder_init_file(name_mp3.c_str(), NULL, &decoder);
+            if (result != MA_SUCCESS)
+            {
+                // printf("Could not load file: %s\n", name_mp3.c_str());    
+            }
 
-                deviceConfig = ma_device_config_init(ma_device_type_playback);
-                deviceConfig.playback.format   = decoder.outputFormat;
-                deviceConfig.playback.channels = decoder.outputChannels;
-                deviceConfig.sampleRate        = decoder.outputSampleRate;
-                deviceConfig.dataCallback      = data_callback1;
-                deviceConfig.pUserData         = &decoder;
+            deviceConfig = ma_device_config_init(ma_device_type_playback);
+            deviceConfig.playback.format   = decoder.outputFormat;
+            deviceConfig.playback.channels = decoder.outputChannels;
+            deviceConfig.sampleRate        = decoder.outputSampleRate;
+            deviceConfig.dataCallback      = data_callback1;
+            deviceConfig.pUserData         = &decoder;
 
-                if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
-                    printf("Failed to open playback device.\n");
-                    ma_decoder_uninit(&decoder);
+            if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) 
+            {
+                printf("Failed to open playback device.\n");
+                ma_decoder_uninit(&decoder);
+            }
 
-                }
-
-                if (ma_device_start(&device) != MA_SUCCESS) {
-                    printf("Failed to start playback device.\n");
-                    ma_device_uninit(&device);
-                    ma_decoder_uninit(&decoder);
-
-                }
-
-             
-                // getchar();
-                // sleep(sec_/20);
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            if (ma_device_start(&device) != MA_SUCCESS) 
+            {
+                printf("Failed to start playback device.\n");
                 ma_device_uninit(&device);
                 ma_decoder_uninit(&decoder);
-                  play_flag = false;
-   
             }
+            // getchar();
+            // sleep(sec_/20);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            ma_device_uninit(&device);
+            ma_decoder_uninit(&decoder);
+            play_flag = false;
+   
+        }
             
- }     /* code */
-    }
+    }     
+}
 
 bool HelloWorldSubscriber::init(
         const std::string& wan_ip,
@@ -238,98 +236,144 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
         n_matched++;
         //logError(HW, "Matched");
         std::cout << "[RTCP] Subscriber matched" << std::endl;
+        //清空两个list
+        ofstream outfile1;
+        outfile1.open("mp3list.txt", ios::out | ios::trunc );
+        outfile1.close();
+        ofstream outfile2;
+        outfile2.open("imglist.txt", ios::out | ios::trunc );
+        outfile2.close();
     }
     else
     {
         n_matched--;
         std::cout << "[RTCP] Subscriber unmatched" << std::endl;
-        exec2("rm *.jpg");
-        exec2("rm *.mp3");
-          cv::destroyAllWindows();
+        if(filename.find(".mp3")!=-1)
+        {
+            //ffmpeg -f concat -safe 0 -i filelist.txt -c copy output.mp4
+            std::string command3 = "ffmpeg -y -f concat -safe 0 -i mp3list.txt -c copy save/"+filename;   
+            // exec2("ffmpeg -f concat -i mp3list.txt -c copy mp3/temp.mp3");
+            exec2(command3.c_str());
+        }
+        else
+        {
+            //filename end with .mp4
+            exec2("ffmpeg -f concat -i mp3list.txt -c copy mp3/temp.mp3");
+            exec2("ffmpeg -r 20 -y -f concat -i imglist.txt -vcodec libx264 image/temp.mp4");
+
+            std::string command4 = "ffmpeg -y -i mp3/temp.mp3 -i image/temp.mp4 -c:v copy -c:a copy save/"+filename;
+            exec2(command4.c_str());
+        }
+        exec2("rm image/*");
+        exec2("rm mp3/*.mp3");
+        count_audio = 0;
+        count_img= 0;
+        cv::destroyAllWindows();
     }
 }
-int count_s = 0;
-int count_sm= 0;
-void HelloWorldSubscriber::SubListener::onNewDataMessage(
+int count_audio = 0;
+long count_img= 0;
+string filename = "";
+void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
         Subscriber* sub)
 {
     if (sub->takeNextData((void*)&hello, &info))
     {
         if (info.sampleKind == ALIVE)
         {
+            //get filename
+            if(filename == "")
+            {
+                if(hello.message().find("Filename"))
+                {   
+                    filename = hello.message().substr(8, hello.message().size()-8);
+                    std::cout << filename << std::endl;
+                }
+            }
 
-
-             cv::Mat imgRes;
-             std::string data= hello.message();
-          
+            cv::Mat imgRes;
+            std::string data= hello.message();
             std::string data_decode= base64_decode(data);
-              int size =data_decode.size();
+            int size =data_decode.size();
+            
+            //process audio
+            // if(data_decode.find('mp3'))
             if(data_decode[size-1]=='3'&&data_decode[size-2]=='p'&&data_decode[size-3]=='m')
             {
-                
                 std::cout<<"mp3"<<std::endl;
                 std::string s(data_decode.begin(), data_decode.end()- 4);
                 
                 try
                 {
-                                count_s++;
-                                write_string_to_file_append(std::to_string(count_s)+".mp3",s);
-                                
-                                 play_flag = true;
+                    count_audio++;
+                    write_string_to_file_append(std::to_string(count_audio)+".mp3",s);
+                    
+                    play_flag = true;
 
-                                name_mp3_g = std::to_string(count_s)+".mp3";
-                                std::string command = "cp "+name_mp3_g+" mp3/"+name_mp3_g;
-                                exec2(command.c_str());
+                    name_mp3_g = std::to_string(count_audio)+".mp3";
+                    std::string command = "mkdir mp3"; //Create storage directory
+                    exec2(command.c_str());
+                    std::string command1 = "cp "+name_mp3_g+" mp3/"+name_mp3_g;
+                    exec2(command1.c_str());
+                    ofstream mp3listfile("mp3list.txt", std::ios::app);
+                    mp3listfile << "file " << name_mp3_g << std::endl;
+                    mp3listfile.close();
 
-                                std::cout<< name_mp3_g<<std::endl;
+                    std::cout<< name_mp3_g<<std::endl;
                                
                 }
-                    catch(const std::exception& e)
-                    {
-                        std::cerr << e.what() << '\n';
-                    }
+
+                catch(const std::exception& e)
+                {
+                    std::cerr << e.what() << '\n';
+                }
             }
+            
             else
             {  
-           
-                 std::vector<uchar> v11(data_decode.begin(),data_decode.end());
+                std::vector<uchar> v11(data_decode.begin(),data_decode.end());
 
-                    cv::Mat  imgRes = cv::imdecode(v11, 1);    
-                    if(!imgRes.empty())      
-                    {
-                       cv::imshow("Subscriber", imgRes);
-                        cv::waitKey(40);
-                        cv::imwrite("image/"+std::to_string(count_sm)+".jpg",imgRes);
-                         count_sm++;
-                     }       
-                    //  play_flag = false ;
+                cv::Mat  imgRes = cv::imdecode(v11, 1);    
+                if(!imgRes.empty())      
+                {
+                    cv::imshow("Subscriber", imgRes);
+                    cv::waitKey(40);
+                    //Create storage directory
+                    std::string command2 = "mkdir image";
+                    exec2(command2.c_str());
+                    cv::imwrite("image/"+std::to_string(count_img)+".jpg",imgRes);
+                    ofstream imglistfile("imglist.txt", std::ios::app);
+                    //format: file 1.jpg
+                    imglistfile << "file " << std::to_string(count_img) << ".jpg" << std::endl;
+                    imglistfile.close();
+                    count_img++;
+                }       
+                //  play_flag = false ;
 
             }
-                std::cout << "[RTCP] Message " << "hello.message()  size "<<data .size()<< " " << hello.index() << " RECEIVED" << std::endl;
-                 this->n_samples++;
-          
-                 
-        
+            std::cout << "[RTCP] Message " << "hello.message()  size "<<data .size()<< " " 
+            << hello.index() << " RECEIVED" << std::endl;
+            this->n_samples++;
         }
     }
 }
 
 void HelloWorldSubscriber::run()
 {
-    std::thread helper1(player,20,name_mp3_g);
+    std::thread helper1(player,20,name_mp3_g);//其实不用传参
     std::cout << "[RTCP] Subscriber running. Please press enter to stop the Subscriber" << std::endl;
     std::cin.ignore();
-      helper1.join(); 
+    helper1.join(); 
 }
 
 void HelloWorldSubscriber::run(
         uint32_t number)
 {
-     std::thread helper1(player,20,name_mp3_g);
+    std::thread helper1(player,20,name_mp3_g);
     std::cout << "[RTCP] Subscriber running until " << number << "samples have been received" << std::endl;
     while (number < this->listener.n_samples)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-     helper1.join(); 
+    helper1.join(); 
 }
