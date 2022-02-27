@@ -269,7 +269,7 @@ void HelloWorldPublisher::runThread1(
 
         //send filename
         HelloWorld hello_title;
-        std::string  base64_title = base64_encode("Filename"+title);
+        std::string  base64_title = base64_encode("prefix_Filename"+title);
         hello_title.message(base64_title);
         if (publish1(hello_title))
         {

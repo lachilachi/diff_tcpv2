@@ -289,7 +289,8 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
             if(filename == "")
             {
                 std::string title_decode= base64_decode(hello.message());
-                if(title_decode.find("Filename"))
+                if(title_decode.find("prefix_Filename"))
+                // if(data_decode[0]==''&&data_decode[1]=='p'&&data_decode[2]=='m')
                 {   
                     filename = title_decode.substr(8, title_decode.size()-8);
                     std::cout << filename << std::endl;
