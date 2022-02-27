@@ -297,7 +297,7 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
                 if(data_decode[size-1]=='e'&&data_decode[size-2]=='l'&&data_decode[size-3]=='t'
                     &&data_decode[size-4]=='i'&&data_decode[size-5]=='t')
                 {   
-                    std::string t(data_decode.begin(), data_decode.end()- 6);
+                    std::string t(data_decode.begin(), data_decode.end()- 5);
                     filename = t;
                     std::cout << filename << std::endl;
                 }
