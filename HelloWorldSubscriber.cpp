@@ -46,7 +46,9 @@ HelloWorldSubscriber::HelloWorldSubscriber()
 {
 }
 
-
+int count_audio = 0;
+long count_img= 0;
+string filename = "";
 
 //write a string to the specified file
 int write_string_to_file_append(const std::string & file_string, const std::string str )
@@ -271,9 +273,7 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
         cv::destroyAllWindows();
     }
 }
-int count_audio = 0;
-long count_img= 0;
-string filename = "";
+
 void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
         Subscriber* sub)
 {
