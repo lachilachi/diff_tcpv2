@@ -30,7 +30,8 @@ using namespace std;
 using namespace eprosima;
 using namespace fastrtps;
 using namespace rtps;
-// for string delimiter
+
+// for later string delimiter
 vector<string> split (string s, string delimiter) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     string token;
@@ -45,7 +46,7 @@ vector<string> split (string s, string delimiter) {
     res.push_back (s.substr (pos_start));
     return res;
 }
-
+// for execute cmd
 std::string exec(const char* cmd) {
     char buffer[128];
     std::string result = "";
@@ -134,7 +135,10 @@ enum  optionIndex {
 /*
 
         std::cout << "There was an error with the input arguments." << std::endl << std::endl;
-        std::coutFILE "The publisher is going to work as a TCP server and if the test" << std::endl;
+        std::cout << "This example needs at least the argument to set if it is going to work" << std::endl;
+        std::cout << "as a 'publisher' or as a 'subscriber'." << std::endl << std::endl;
+        
+        std::cout << "The publisher is going to work as a TCP server and if the test" << std::endl;
         std::cout << "is through a NAT it must have its public IP in the wan_ip argument." << std::endl << std::endl;
         std::cout << "The optional arguments are: publisher [times] [interval] [wan_ip] [port] " << std::endl;
         std::cout << "\t- times: Number of messages to send (default: unlimited = 0). " << std::endl;
@@ -154,7 +158,7 @@ enum  optionIndex {
 
 const option::Descriptor usage[] = {
     { UNKNOWN_OPT, 0,"", "",                Arg::None,
-        "Usage: HelloWorldExampleTCP <publisher|subscriber>  file name testmp3.mp3/mp4\n\nGeneral options:" },
+        "Usage: HelloWorldExampleTCP <publisher|subscriber> <options> <../filename> \n\nGeneral options:" },
     { HELP,    0,"h", "help",               Arg::None,      "  -h \t--help  \tProduce help message." },
     { TLS, 0, "t", "tls",          Arg::None,      "  -t \t--tls \tUse TLS." },
     { WHITELIST, 0, "w", "whitelist",       Arg::String,    "  -w \t--whitelist \tUse Whitelist." },
@@ -210,22 +214,23 @@ int main(int argc, char** argv)
     int port = 5100;
     bool use_tls = false;
     std::vector<std::string> whitelist;
-     std::string filename;
+    
+    std::string filename;
     int file_type = 1;
-    if (argc > 2)
+    if (argc > 2)//when para>3
     {
         if (strcmp(argv[1], "publisher") == 0)
         {
-                    type = 1;
-                    filename = argv[2];
-                    // std::cout<<
-                    if(filename.find(".mp3")!=-1)
-                    {
-                        file_type = 1;
-                    }else
-                    {
-                        file_type = 2;
-                    }
+            type = 1;
+            filename = argv[2];
+            
+            if(filename.find(".mp3")!=-1)//匹配返回1，！=-1
+            {
+                file_type = 1; //audio
+            }else
+            {
+                file_type = 2; //video
+            }
         }
         else if (strcmp(argv[1], "subscriber") == 0)
         {
@@ -301,7 +306,7 @@ int main(int argc, char** argv)
             }
         }
     }
-    else
+    else //input para < 3
     {
         option::printUsage(fwrite, stdout, usage, columns);
         return 0;
@@ -313,47 +318,58 @@ int main(int argc, char** argv)
         case 1:
             {
 
-                    string  command1 = " rm *.mp3 ";
-                    exec(command1.c_str());
-                    command1 = " rm *.jpg ";
-                    exec(command1.c_str());
-                    string command = "ffmpeg -i "+filename+">1.txt 2>&1";
+                string  command1 = " rm *.mp3 ";
+                exec(command1.c_str());
+                command1 = " rm *.jpg ";
+                exec(command1.c_str());
+
+                string command = "ffmpeg -i "+filename+">1.txt 2>&1";//显示文件信息到后台
+                exec(command.c_str());
+
+                if(file_type == 1)//audio
+                {
+                    //切片1s  Split audio
+                    // ffmpeg -loglevel quiet -i 1.mp3 -f segment -segment_time 1 -c copy %03d.mp3
+                    command = "ffmpeg -i "+filename+" -f segment -segment_time 1 -c copy %04d.mp3";
                     exec(command.c_str());
-                    if( file_type ==1)
-                        {
-                            // ffmpeg -i 1.mp3 -f segment -segment_time 1 -c copy %03d.mp3
-                                command = "ffmpeg -i "+filename+"   -f segment -segment_time 1 -c copy %04d.mp3";
-                                exec(command.c_str());
-                        }
-                        else
-                        {
-                            // ffmpeg -i ../testVideo.mp4 -vf fps=20 out%05d.jpg
-                            //  ffmpeg -i ../testVideo.mp4 testmp3.mp3
-                                command = " rm testmp3.mp3 ";
-                                exec(command.c_str());
-                                    command = "ffmpeg -i "+filename+"   -vf fps=20 %05d.jpg";
-                                exec(command.c_str());
-                                    std::cout << "MP3 輸出" << std::endl;
-                                command = "ffmpeg -i "+filename+"   testmp3.mp3";
-                                exec(command.c_str());
-                                    std::cout << "MP3 切割" << std::endl;
-                                command = " ffmpeg -i testmp3.mp3 -f segment -segment_time 1 -c copy  %04d.mp3";
-                                exec(command.c_str());
-                        }
+                }
+                else//video
+                {
+                    // ffmpeg -i ../testVideo.mp4 -vf fps=20 out%05d.jpg
+                    // ffmpeg -i ../testVideo.mp4 testmp3.mp3
+                    command = " rm temp.mp3 "; //clear previous temporary files
+                    exec(command.c_str());
+                    // std::cout << "MP4 slice" << std::endl;
+                    command = "ffmpeg -i "+filename+" -vf fps=20 %05d.jpg";
+                    exec(command.c_str());
+                    
+                    // std::cout << "MP3 isolate" << std::endl;
+                    command = "ffmpeg -i "+filename+" temp.mp3";
+                    exec(command.c_str());
+                    // std::cout << "MP3 slice" << std::endl;
+                    command = " ffmpeg -i temp.mp3 -f segment -segment_time 1 -c copy  %04d.mp3";
+                    exec(command.c_str());
+                }
+
                 int hour = 0;
                 int min = 0;
                 int sec = 0;
                 bool pos =false;
-                std::string sFilename = "1.txt";
+                //
+                std::string sFilename = "info.txt"; 
                 std::ifstream fileSource(sFilename); // Creates an input file stream
-                if (!fileSource) {
+                
+                if (!fileSource) 
+                {
                     std::cerr << "Canot open " << sFilename << std::endl;
                     exit(-1);
                 }
-                else {
+                else 
+                {
+                    // Get playback time  Duration: xx:xx:xx.xx
                     // Intermediate buffer
                     std::string buffer;
-                    // By default, the >> operator reads word by workd (till whitespace)
+                    // By default, the >> operator reads word by word (till whitespace)
                     while (fileSource >> buffer)
                     {
                         if(pos)
@@ -363,42 +379,43 @@ int main(int argc, char** argv)
                             string delimiter = ":";
 
                             vector<string> v = split (str, delimiter);
-                            for (auto i : v) cout << i << endl;
-                            std::cout<< v[2].substr(0, 2)<< endl;
+                            // for (auto i : v) cout << i << endl;
+                            // std::cout<< v[2].substr(0, 2)<< endl;
                             hour = atoi( v[0].c_str() );
                             min = atoi( v[1].c_str() );
-                            sec  = atoi( v[2].substr(0, 2).c_str() );
+                            sec = atoi( v[2].substr(0, 2).c_str() );
                             pos = false;
                         }
 
-                        if(buffer=="Duration:")
+                        if(buffer=="Duration:")//放上面会导致“duration”输出两次
                         {
-                                std::cout << buffer << std::endl;
-                                pos = true;
+                            std::cout << buffer << std::endl;
+                            pos = true;
                         }
-                    
                     }
 
 		            std::cout<< hour<<"-"<<min<<"-"<<sec<<endl;
-            }
-                int  sec_total = hour*60*60+min*60+sec;
-                int fps_20 = sec_total * 20;
+                }
+                //20frame/s
+                int sec_total = hour*60*60+min*60+sec;
+                int fps_20 = sec_total * 20;//从0开始不必加1
+                
                 HelloWorldPublisher mypub;
                 if (mypub.init(wan_ip, static_cast<uint16_t>(port), use_tls, whitelist))
                 {
                    
 
-                     std::cout<<"cout "<<fps_20<<std::endl;  
+                    std::cout<<"total frame "<<fps_20<<std::endl;  
                     if(file_type ==1)
                     {
-                          std::cout<<" ------MP3------------- "<<fps_20<<std::endl;  
-                            std::cout<<"filename "<<filename<<std::endl;  
-                             mypub.run1(fps_20,filename);
+                        std::cout<<" ------MP3------------- "<<fps_20<<std::endl;  
+                        std::cout<<"filename "<<filename<<std::endl;  
+                        mypub.run1(fps_20,filename,filename);
                     }
                     else
                     {
-                          std::cout<<"------MP4------------- "<<fps_20<<std::endl;  
-                           mypub.run1(fps_20,"1");
+                        std::cout<<"------MP4------------- "<<fps_20<<std::endl;  
+                        mypub.run1(fps_20,"1",filename);
                     }
                 }
                 break;
