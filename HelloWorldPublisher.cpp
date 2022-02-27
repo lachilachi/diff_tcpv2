@@ -55,6 +55,7 @@ HelloWorldPublisher::HelloWorldPublisher()
 
 
 int count1 = 0;
+int matched = 0;
 /* 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
@@ -209,11 +210,14 @@ void HelloWorldPublisher::PubListener::onPublicationMatched(
         firstConnected = true;
         //logError(HW, "Matched");
         std::cout << "[RTCP] Publisher matched" << std::endl;
+        matched = 1;
+
     }
     else
     {
         n_matched--;
         std::cout << "[RTCP] Publisher unmatched" << std::endl;
+        matched = 0;
     }
 }
 
@@ -256,7 +260,7 @@ void HelloWorldPublisher::runThread1(
         string name_mp3_send;
         
         //send after matched
-        while(HelloWorldPublisher::PubListener::n_matched == 0)
+        while(matched == 0)
         {
             std::cout << "matching...... "<<std::endl;
             // if (HelloWorldPublisher::PubListener::n_matched == 1) 
