@@ -250,6 +250,7 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
     {
         n_matched--;
         std::cout << "[RTCP] Subscriber unmatched" << std::endl;
+        std::cout << "=========filename:"<<filename<<"==============" << std::endl;
         if(filename.find(".mp3")!=-1)
         {
             //ffmpeg -f concat -safe 0 -i filelist.txt -c copy output.mp4
