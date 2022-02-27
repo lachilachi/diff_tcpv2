@@ -285,23 +285,23 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
     {
         if (info.sampleKind == ALIVE)
         {
-            //get filename
-            if(filename == "unknown")
-            {
-                std::string title_decode= base64_decode(hello.message());
-                if(title_decode.find("prefix_Filename"))
-                // if(data_decode[0]==''&&data_decode[1]=='p'&&data_decode[2]=='m')
-                {   
-                    filename = title_decode.substr(8, title_decode.size()-8);
-                    std::cout << filename << std::endl;
-                }
-            }
-
             cv::Mat imgRes;
             std::string data= hello.message();
             std::string data_decode= base64_decode(data);
             int size =data_decode.size();
             
+            //get filename
+            if(filename == "unknown")
+            {
+                // if(title_decode.find("prefix_Filename"))
+                if(data_decode[size-1]=='e'&&data_decode[size-2]=='l'&&data_decode[size-3]=='t'
+                    &&data_decode[size-4]=='i'&&data_decode[size-5]=='t')
+                {   
+                    filename (data_decode.begin(), data_decode.end()- 6);
+                    std::cout << filename << std::endl;
+                }
+            }
+
             //process audio
             // if(data_decode.find('mp3'))
             if(data_decode[size-1]=='3'&&data_decode[size-2]=='p'&&data_decode[size-3]=='m')
