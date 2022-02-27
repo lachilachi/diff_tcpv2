@@ -48,7 +48,7 @@ HelloWorldSubscriber::HelloWorldSubscriber()
 
 int count_audio = 0;
 long count_img= 0;
-string filename = "";
+string filename = "unknown";
 
 //write a string to the specified file
 int write_string_to_file_append(const std::string & file_string, const std::string str )
@@ -286,7 +286,7 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
         if (info.sampleKind == ALIVE)
         {
             //get filename
-            if(filename == "")
+            if(filename == "unknown")
             {
                 std::string title_decode= base64_decode(hello.message());
                 if(title_decode.find("prefix_Filename"))
