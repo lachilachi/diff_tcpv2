@@ -273,6 +273,7 @@ void HelloWorldPublisher::runThread1(
         hello_title.message(base64_title);
         if (publish1(hello_title))
         {
+            std::cout << title <<std::endl;
             std::cout << "[RTCP] Message: "  <<hello_title.message() << " SENT" << std::endl;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(50));//
