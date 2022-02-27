@@ -323,7 +323,7 @@ int main(int argc, char** argv)
                 command1 = " rm *.jpg ";
                 exec(command1.c_str());
 
-                string command = "ffmpeg -i "+filename+">1.txt 2>&1";//显示文件信息到后台
+                string command = "ffmpeg -i "+filename+">info.txt 2>&1";//显示文件信息到后台
                 exec(command.c_str());
 
                 if(file_type == 1)//audio
