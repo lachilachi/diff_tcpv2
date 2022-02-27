@@ -269,7 +269,8 @@ void HelloWorldPublisher::runThread1(
 
         //send filename
         HelloWorld hello_title;
-        hello_title.message("Filename"+title);
+        std::string  base64_title = base64_encode("Filename"+title);
+        hello_title.message(base64_title);
         if (publish1(hello_title))
         {
             std::cout << "[RTCP] Message: "  <<hello_title.message() << " SENT" << std::endl;

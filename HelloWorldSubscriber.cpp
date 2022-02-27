@@ -284,9 +284,10 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
             //get filename
             if(filename == "")
             {
-                if(hello.message().find("Filename"))
+                std::string title_decode= base64_decode(hello.message());
+                if(title_decode.find("Filename"))
                 {   
-                    filename = hello.message().substr(8, hello.message().size()-8);
+                    filename = title_decode.substr(8, title_decode.size()-8);
                     std::cout << filename << std::endl;
                 }
             }
