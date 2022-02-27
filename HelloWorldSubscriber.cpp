@@ -263,8 +263,11 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
             exec2("ffmpeg -f concat -i mp3list.txt -c copy mp3/temp.mp3");
             exec2("ffmpeg -r 20 -y -f concat -i imglist.txt -vcodec libx264 image/temp.mp4");
 
+            std::string command5 = "mkdir save";
+            exec2(command5.c_str());
             std::string command4 = "ffmpeg -y -i mp3/temp.mp3 -i image/temp.mp4 -c:v copy -c:a copy save/"+filename;
             exec2(command4.c_str());
+            
         }
         exec2("rm image/*");
         exec2("rm mp3/*.mp3");
@@ -317,7 +320,7 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
                     std::string command1 = "cp "+name_mp3_g+" mp3/"+name_mp3_g;
                     exec2(command1.c_str());
                     ofstream mp3listfile("mp3list.txt", std::ios::app);
-                    mp3listfile << "file " << name_mp3_g << std::endl;
+                    mp3listfile << "file mp3/" << name_mp3_g << std::endl;
                     mp3listfile.close();
 
                     std::cout<< name_mp3_g<<std::endl;
@@ -345,7 +348,7 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
                     cv::imwrite("image/"+std::to_string(count_img)+".jpg",imgRes);
                     ofstream imglistfile("imglist.txt", std::ios::app);
                     //format: file 1.jpg
-                    imglistfile << "file " << std::to_string(count_img) << ".jpg" << std::endl;
+                    imglistfile << "file image/" << std::to_string(count_img) << ".jpg" << std::endl;
                     imglistfile.close();
                     count_img++;
                 }       
