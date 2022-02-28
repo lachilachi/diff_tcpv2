@@ -308,14 +308,15 @@ void HelloWorldPublisher::runThread1(
             if(i%20==0)//locate mp3
             {
                 std::stringstream ss1;
-                if(i==0)
-                {
-                    ss1<<std::setw(4)<<std::setfill('0')<<i;
-                }
-                else
-                {
-                    ss1<<std::setw(4)<<std::setfill('0')<<i/20+1;
-                }
+                // if(i==0)
+                // {
+                //     ss1<<std::setw(4)<<std::setfill('0')<<i;
+                // }
+                // else
+                // {
+                //     ss1<<std::setw(4)<<std::setfill('0')<<i/20+1;
+                // }
+                ss1<<std::setw(4)<<std::setfill('0')<<i/20;
                 string name_mp3= ss1.str()+".mp3";
                 std::cout<<name_mp3<<std::endl;
                 std::ifstream t(name_mp3);
