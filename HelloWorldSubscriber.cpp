@@ -299,7 +299,7 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
                 {   //t=../filename.mp4
                     std::string path(data_decode.begin(), data_decode.end()- 5);
                    
-                    filename = path(rfind(path, '/') + 1, path.end());
+                    filename = path(path.rfind('/') + 1, path.end());
                     std::cout << filename << std::endl;
                 }
             }
