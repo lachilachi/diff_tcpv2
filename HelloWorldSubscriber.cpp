@@ -275,6 +275,7 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
         }
         exec2("rm image/*");
         exec2("rm mp3/*.mp3");
+        exec2("rm *.mp3");
         count_audio = 0;
         count_img= 0;
         cv::destroyAllWindows();
