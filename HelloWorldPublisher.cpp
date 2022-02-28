@@ -280,7 +280,7 @@ void HelloWorldPublisher::runThread1(
         std::this_thread::sleep_for(std::chrono::milliseconds(50));//
         
 
-        for(uint32_t i = 0;i<=samples-1;++i)
+        for(uint32_t i = 0;i<=samples-2;++i)
         {
             std::string mp3_contents;
             bool send_audio = false;
