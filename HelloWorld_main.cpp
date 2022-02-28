@@ -340,7 +340,7 @@ int main(int argc, char** argv)
                     command = " rm temp.mp3 "; //clear previous temporary files
                     exec(command.c_str());
                     // std::cout << "MP4 slice" << std::endl;
-                    command = "ffmpeg -i "+filename+" -vf fps=20 %05d.jpg";
+                    command = "ffmpeg -i "+filename+" -qscale 1 -vf fps=20 %05d.jpg";
                     exec(command.c_str());
                     
                     // std::cout << "MP3 isolate" << std::endl;
