@@ -384,7 +384,7 @@ int main(int argc, char** argv)
                             hour = atoi( v[0].c_str() );
                             min = atoi( v[1].c_str() );
                             sec = std::stof(v[2]);
-                            milisec = sec * 1000;
+                            long milisec = sec * 1000;
                             pos = false;
                         }
 
