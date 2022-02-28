@@ -353,7 +353,7 @@ int main(int argc, char** argv)
 
                 int hour = 0;
                 int min = 0;
-                int sec = 0;
+                float sec = 0.0;
                 bool pos =false;
                 //
                 std::string sFilename = "info.txt"; 
@@ -383,7 +383,8 @@ int main(int argc, char** argv)
                             // std::cout<< v[2].substr(0, 2)<< endl;
                             hour = atoi( v[0].c_str() );
                             min = atoi( v[1].c_str() );
-                            sec = atoi( v[2].substr(0, 2).c_str() );
+                            sec = std::stof(v[2]);
+                            milisec = sec * 1000;
                             pos = false;
                         }
 
@@ -397,8 +398,9 @@ int main(int argc, char** argv)
 		            std::cout<< hour<<"-"<<min<<"-"<<sec<<endl;
                 }
                 //20frame/s
-                int sec_total = hour*60*60+min*60+sec;
-                int fps_20 = sec_total * 20;//从0开始不必加1
+                float sec_total = hour*60*60+min*60+sec;
+                long milisec_total = sec_total * 1000;
+                long fps_20 = milisec_total / 50;
                 
                 HelloWorldPublisher mypub;
                 if (mypub.init(wan_ip, static_cast<uint16_t>(port), use_tls, whitelist))
