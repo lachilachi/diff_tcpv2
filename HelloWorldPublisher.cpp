@@ -295,7 +295,36 @@ void HelloWorldPublisher::runThread1(
                 cv::imshow("Pubclisher",img);
                 cv::waitKey(40);
             }
-            
+            if(i==0)
+            {
+                std::stringstream ss0;
+                ss0<<std::setw(4)<<std::setfill('0');
+                string name_mp3= ss0.str()+".mp3";
+                std::cout<<name_mp3<<std::endl;
+                std::ifstream t(name_mp3);
+                std::stringstream buffer;
+                buffer << t.rdbuf();
+                std::string contents(buffer.str());
+                std::cout<<contents.size()<<std::endl;
+                mp3_contents = contents;
+                if(mp3_contents.empty())
+                {
+                    std::cout<<name_mp3<<std::endl;
+                    break;
+                }
+                mp3_contents.insert(mp3_contents.size(),"mp3");
+                std::string  base64_str = base64_encode(mp3_contents);
+                HelloWorld hello_3;
+                hello_3.index(i);
+                hello_3.message(base64_str);
+                if (publish1(hello_3))//send audio segment
+                {
+                    std::cout << "[RTCP] Message: "  <<hello_3.message().size()<< " with index: "
+                    << hello_3.index() << " SENT" << std::endl;
+                }
+                //std::this_thread::sleep_for(std::chrono::milliseconds(1000));  //sub play for 1 second
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
             if(i%20==0)//locate mp3
             {
                 std::stringstream ss1;
