@@ -261,11 +261,14 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
         else
         {
             //filename end with .mp4
-            exec2("ffmpeg -f concat -i mp3list.txt -c copy mp3/temp.mp3");
-            exec2("ffmpeg -r 20 -y -f concat -i imglist.txt -vcodec libx264 image/temp.mp4");
-
             std::string command5 = "mkdir save";
             exec2(command5.c_str());
+
+            exec2("ffmpeg -f concat -i mp3list.txt -c copy mp3/temp.mp3");
+            std::string command6 = "cp mp3/temp.mp3 save/"+filename.substr(0, filename.length() - 4)+".mp3";
+            exec2(command6.c_str());
+            exec2("ffmpeg -r 20 -y -f concat -i imglist.txt -vcodec libx264 image/temp.mp4");
+    
             std::string command4 = "ffmpeg -y -i mp3/temp.mp3 -i image/temp.mp4 -c:v copy -c:a copy save/"+filename;
             exec2(command4.c_str());
             
