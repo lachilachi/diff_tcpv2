@@ -298,14 +298,8 @@ void HelloWorldSubscriber::SubListener::onNewDataMessage( //hello3,hello4
                     &&data_decode[size-4]=='i'&&data_decode[size-5]=='t')
                 {   //t=../filename.mp4
                     std::string path(data_decode.begin(), data_decode.end()- 5);
-                    
-                    int beginIndex = 0;
-                    beginIndex = lastIndexOf(path, '/');
-                    if (beginIndex != 0)
-                    {
-                        beginIndex++;
-                    }
-                    filename = path(beginIndex, path.end());
+                   
+                    filename = path(rfind(path, '/') + 1, path.end());
                     std::cout << filename << std::endl;
                 }
             }
