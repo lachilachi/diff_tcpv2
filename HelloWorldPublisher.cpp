@@ -326,7 +326,7 @@ void HelloWorldPublisher::runThread1(
                     std::cout << "[RTCP] Message: "  <<hello_3.message().size()<< " with index: "
                     << hello_3.index() << " SENT" << std::endl;
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(250));
             }
 
             std::string encoding;
@@ -389,7 +389,7 @@ void HelloWorldPublisher::runThread1(
                 std::cout << "[RTCP] Message: "  <<hello_3.message().size()<< " with index: "
                 << hello_3.index() << " SENT" << std::endl;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
         }
     }
     // helper1.join();
