@@ -286,15 +286,15 @@ void HelloWorldPublisher::runThread1(
             bool send_audio = false;
             //locate frame and show
             std::stringstream ss;
-            if(i==0)
-            {
-                ss<<std::setw(5)<<std::setfill('0')<<i;
-            }
-            else
-            {
-                ss<<std::setw(5)<<std::setfill('0')<<i+1;
-            }
-            
+            // if(i==0)
+            // {
+            //     ss<<std::setw(5)<<std::setfill('0')<<i;
+            // }
+            // else
+            // {
+            //     ss<<std::setw(5)<<std::setfill('0')<<i+1;
+            // }
+            ss<<std::setw(5)<<std::setfill('0')<<i+1;
             string name= ss.str()+".jpg";
             std::cout<<name<<std::endl;     
             cv::Mat img = cv::imread(name,1); //CV_LOAD_IMAGE_GRAYSCALE
