@@ -400,7 +400,7 @@ int main(int argc, char** argv)
                 //20frame/s
                 float sec_total = hour*60*60+min*60+sec;
                 long milisec_total = sec_total * 1000;
-                long fps_20 = milisec_total / 50;
+                long fps_20 = floor(milisec_total / 50);
                 
                 HelloWorldPublisher mypub;
                 if (mypub.init(wan_ip, static_cast<uint16_t>(port), use_tls, whitelist))
