@@ -376,7 +376,7 @@ void HelloWorldPublisher::runThread1(
     {
         std::cout << "mp3 \n";
         samples = samples/20;
-        for (uint32_t i = 0; i < samples; ++i)
+        for (uint32_t i = 0; i < samples-1; ++i)
         {
             std::stringstream ss1;
             ss1<<std::setw(4)<<std::setfill('0')<<i+1;
