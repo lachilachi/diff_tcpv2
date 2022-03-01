@@ -260,6 +260,7 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
         }
         else
         {
+            cv::destroyAllWindows();
             //filename end with .mp4
             std::string command5 = "mkdir save";
             exec2(command5.c_str());
@@ -271,14 +272,14 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
     
             std::string command4 = "ffmpeg -y -i mp3/temp.mp3 -i image/temp.mp4 -c:v copy -c:a copy save/"+filename;
             exec2(command4.c_str());
-            
+            filename = 'unknown'
         }
         exec2("rm image/*");
         exec2("rm mp3/*.mp3");
         exec2("rm *.mp3");
         count_audio = 0;
         count_img= 0;
-        cv::destroyAllWindows();
+        
     }
 }
 
