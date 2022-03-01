@@ -272,7 +272,7 @@ void HelloWorldSubscriber::SubListener::onSubscriptionMatched(
     
             std::string command4 = "ffmpeg -y -i mp3/temp.mp3 -i image/temp.mp4 -c:v copy -c:a copy save/"+filename;
             exec2(command4.c_str());
-            filename = 'unknown'
+            filename = "unknown";
         }
         exec2("rm image/*");
         exec2("rm mp3/*.mp3");
